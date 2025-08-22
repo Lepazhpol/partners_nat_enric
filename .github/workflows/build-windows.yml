@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-win:
-    runs-on: windows-2022  # фиксируем стабильный раннер
+    runs-on: windows-2022   # фиксируем стабильный раннер
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,20 +21,24 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install pandas openpyxl
           pip install pyinstaller
 
-      - name: Build with PyInstaller (no icon)
+      - name: Build with PyInstaller (onefile)
         shell: pwsh
         run: |
-          pyinstaller --noconfirm --noconsole --clean `
+          pyinstaller --noconfirm --noconsole --clean --onefile `
             --name PartnerListEnricher `
+            --hidden-import pandas `
+            --hidden-import openpyxl `
             app\main.py
 
       - name: Pack artifact
         shell: pwsh
         run: |
-          Compress-Archive -Path "dist/PartnerListEnricher/*" -DestinationPath "PartnerListEnricher_win.zip"
+          New-Item -ItemType Directory -Path dist_single | Out-Null
+          Copy-Item "dist\PartnerListEnricher.exe" "dist_single\PartnerListEnricher.exe"
+          Compress-Archive -Path "dist_single\*" -DestinationPath "PartnerListEnricher_win.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
