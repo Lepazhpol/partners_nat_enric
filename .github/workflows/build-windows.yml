@@ -1,5 +1,8 @@
 name: Build Windows
 
+permissions:
+  contents: write   # нужно для загрузки артефактов в релиз
+
 on:
   push:
     branches: [ main, master ]
