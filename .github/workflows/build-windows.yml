@@ -8,15 +8,22 @@ on:
 
 jobs:
   build-win:
-    runs-on: windows-latest
+    runs-on: windows-2022   # фиксируем стабильный образ
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.11'   # PyInstaller стабилен
+
+      - name: Show env
+        shell: pwsh
+        run: |
+          python --version
+          pip --version
+          Get-ChildItem -Recurse -Depth 2
 
       - name: Install deps
         run: |
@@ -27,6 +34,7 @@ jobs:
       - name: Build with PyInstaller
         shell: pwsh
         run: |
+          # Если нет app/icon.ico — сними флаг --icon и --add-data
           pyinstaller --noconfirm --noconsole --clean `
             --name PartnerListEnricher `
             --icon app/icon.ico `
